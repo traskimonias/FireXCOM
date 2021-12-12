@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "ZBqXy8He9xKZQrQW1LjskKk1lDaDvbG5PqfT6S41+2JLpiWo/L29xP8yQ9fbXk/1d8l1xkp0POhByZyuQpOFtg==",
+  "success": true,
+  "projectFilePath": "C:\\dev\\firexcom\\FireXCOM\\FireXCOM.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\graci\\.nuget\\packages\\monogame.content.builder.task\\3.8.0.1641\\monogame.content.builder.task.3.8.0.1641.nupkg.sha512",
+    "C:\\Users\\graci\\.nuget\\packages\\monogame.framework.desktopgl\\3.8.0.1641\\monogame.framework.desktopgl.3.8.0.1641.nupkg.sha512"
+  ],
+  "logs": []
+}
