@@ -31,12 +31,18 @@ namespace FireXCOM
             int altura = 40;
             int anchura = 40;
             TileManager tileManager = new TileManager(posX,posY,filas,columnas,margen,altura,anchura,GraphicsDevice);
+            //Add test character
             Texture2D texture2D = new Texture2D(GraphicsDevice,1,1);
             texture2D.SetData(new Color[] { Color.Yellow });
             CharacterInfo character = new CharacterInfo(texture2D);
+            //Add second test character
+            Texture2D texture2D2 = new Texture2D(GraphicsDevice,1,1);
+            texture2D2.SetData(new Color[] { Color.Purple });
+            CharacterInfo character2 = new CharacterInfo(texture2D2);
             physicsManager.AddGameObject(tileManager);
             renderingManager.AddGameObject(tileManager);
-            tileManager.AddCharacter(character,5,5);
+            tileManager.AddCharacter(character,5,5,1);
+            tileManager.AddCharacter(character2,2,4,1);
 
             base.Initialize();
         }

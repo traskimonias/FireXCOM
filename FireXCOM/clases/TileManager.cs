@@ -15,8 +15,7 @@ public class TileManager : GameObject2D
     Dictionary<string,int> HashPathFinding;
     public List<CharacterObject> Characters;
     private CharacterObject SelectedCharacter=null;
-    
-
+    public Dictionary<int,List<CharacterObject>> CharactersByTeam = new Dictionary<int, List<CharacterObject>>();
     
     public TileManager(int x, int y, int rows, int columns, int margin, int tileWidth, int tileHeight, GraphicsDevice graphicsDevice)
         :base(x,y,0,0,null)
@@ -56,21 +55,24 @@ public class TileManager : GameObject2D
             character.Render(spriteBatch);
         }
     }
-    public void AddCharacter(CharacterInfo characterInfo, int column, int row){
+    public void AddCharacter(CharacterInfo characterInfo, int column, int row, int team){
         foreach(Tile tile in Children){
             if(tile.Column == column && tile.Row == row){
                 int charX = Convert.ToInt32(tile.position.X + tile.width/4);
                 int charY = Convert.ToInt32(tile.position.Y + tile.height/4);
                 int charWidth = Convert.ToInt32(tile.width/2);
                 int charHeight = Convert.ToInt32(tile.height/2);
-                CharacterObject  character = new CharacterObject(charX,charY,charWidth,charHeight,characterInfo, characterInfo.texture);
+                CharacterObject  character = new CharacterObject(charX,charY,charWidth,charHeight,characterInfo, characterInfo.texture,team);
                 Characters.Add(character);
                 tile.character = character;
                 characterInfo.LinkToTile(tile);
+                if(!CharactersByTeam.ContainsKey(team)){
+                    CharactersByTeam[team] = new List<CharacterObject>();
+                }
+                CharactersByTeam[team].Add(character);
             }
         }
     }
-    
     public void ShowCharacterReach(CharacterObject character){
         MarkCanMove(character.characterInfo.movement,character.characterInfo.tile);
     }
@@ -155,8 +157,10 @@ public class TileManager : GameObject2D
             }
         }
         if(tileCharacter!=null){
-            SelectedCharacter= tileCharacter;
-            ShowCharacterReach(tileCharacter);   
+            if(tileCharacter.actionsLeft>0){
+                SelectedCharacter= tileCharacter;
+                ShowCharacterReach(tileCharacter);   
+            }
         }else{
             if(tile.InMovementReach && SelectedCharacter!= null){
                 MoveCharacter(SelectedCharacter,tile);
@@ -169,6 +173,58 @@ public class TileManager : GameObject2D
     }
     void MoveCharacter(CharacterObject characterToMove, Tile goalTile){
         characterToMove.LinkToTile(goalTile);
+        characterToMove.actionsLeft--;
+        CheckTurnEnded(characterToMove.team);
     }
-    
+    void CheckTurnEnded(int team){
+        bool anyActionsLeft= false;
+        foreach(CharacterObject character in CharactersByTeam[team]){
+            if(character.actionsLeft>0){
+                anyActionsLeft=true;
+                break;
+            }
+        }
+        if(anyActionsLeft==false){
+            EndTurn(team);
+        }
+    }
+    void RegainActions(int team){
+        foreach(CharacterObject character in CharactersByTeam[team]){
+            character.actionsLeft = character.maxActions;
+        }
+    }
+    void EndTurn(int team){
+        Debug.ShowText($"Ending {team}'s turn");
+        //Start next teams turn
+        List<int> teams = new List<int>();
+        foreach(int t in CharactersByTeam.Keys){
+            teams.Add(t);
+        }
+        int nextTeam=0;
+        int currentTeamIndex = 0;
+        for(int i = 0; i< teams.Count;i++){
+            if(team ==teams[i]) currentTeamIndex=i;
+        }
+        if(teams.Count==currentTeamIndex+1){
+            nextTeam = teams[0];
+        }else{
+            nextTeam = teams[currentTeamIndex];
+        }
+        Debug.ShowText($"Starting {team}'s turn");
+
+        RegainActions(nextTeam);
+    }
+    public List<CharacterRelationInfo> GetRelationToOtherCharacters(CharacterObject character){
+        List<CharacterRelationInfo> characterRelations = new List<CharacterRelationInfo>();
+        //Debería devolver la distancia a los enemigos y a cuales puede atacar
+        
+        
+        return characterRelations;
+    }
+}
+public class CharacterRelationInfo
+{
+    int distance{get;set;}
+    bool canBeAttacked{get;set;}
+    CharacterObject character;
 }
